@@ -6,6 +6,7 @@ import org.smartboot.http.client.Header;
 import org.smartboot.http.client.HttpClient;
 import org.smartboot.http.client.HttpRest;
 import org.smartboot.http.client.ResponseHandler;
+import org.smartboot.http.common.enums.BodyStreamStatus;
 import org.smartboot.http.common.enums.HeaderNameEnum;
 import org.smartboot.http.common.enums.HttpTypeEnum;
 import org.smartboot.http.server.HttpResponse;
@@ -54,19 +55,26 @@ public class ProxyServerHandler extends HttpServerHandler {
             @Override
             public void onHeaderComplete(AbstractResponse abstractResponse) throws IOException {
                 if (request.getRequestType() == HttpTypeEnum.HTTP) {
+                    //将后端的响应反馈给前端
                     HttpResponse response = request.newHttpRequest().getResponse();
                     response.setHttpStatus(abstractResponse.getStatus(), abstractResponse.getReasonPhrase());
+                    response.getOutputStream().disableChunked();
                     abstractResponse.getHeaderNames().forEach(name -> response.addHeader(name, abstractResponse.getHeader(name)));
                     response.getOutputStream().flush();
                 }
             }
 
             @Override
-            public boolean onBodyStream(ByteBuffer buffer, AbstractResponse request) {
+            public BodyStreamStatus onBodyStream(ByteBuffer buffer, AbstractResponse request) {
+                //将后端的响应反馈给前端
                 var backendSession = request.getSession();
                 backendSession.awaitRead();
                 byte[] bytes = new byte[buffer.remaining()];
                 buffer.get(bytes);
+//                System.out.println(new String(bytes));
+                if (bytes.length == 0) {
+                    System.out.println("aaa");
+                }
                 try {
                     clientSession.writeBuffer().write(bytes, 0, bytes.length, writeBuffer -> {
                         backendSession.signalRead();
@@ -74,7 +82,7 @@ public class ProxyServerHandler extends HttpServerHandler {
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
-                return false;
+                return BodyStreamStatus.OnAsync;
             }
         });
 
@@ -82,14 +90,15 @@ public class ProxyServerHandler extends HttpServerHandler {
     }
 
     @Override
-    public boolean onBodyStream(ByteBuffer buffer, Request request) {
+    public BodyStreamStatus onBodyStream(ByteBuffer buffer, Request request) {
+        //将前端的数据包投递给后台
         var proxy = proxies.get(request);
         byte[] bytes = new byte[buffer.remaining()];
         buffer.get(bytes);
         request.getAioSession().awaitRead();
         Body body = proxy.rest.body();
-        body.write(bytes, 0, bytes.length, (Consumer<Body<? extends HttpRest>>) body1 -> request.getAioSession().signalRead());
-        return false;
+        body.write(bytes, 0, bytes.length, (Consumer<Body<? extends HttpRest>>) _ -> request.getAioSession().signalRead());
+        return BodyStreamStatus.OnAsync;
     }
 
     @Override

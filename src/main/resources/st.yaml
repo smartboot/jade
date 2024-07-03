@@ -4,7 +4,7 @@ port: 8080
 # 配置文件 config.yaml
 servers:
   - name: backend1
-    host: www.baidu.com
+    host: www.oschina.net
     port: 443
   - name: backend2
     host: www.baidu.com
