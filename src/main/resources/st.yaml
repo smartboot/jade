@@ -1,0 +1,20 @@
+host: 0.0.0.0
+port: 8080
+
+# 配置文件 config.yaml
+servers:
+  - name: backend1
+    host: www.baidu.com
+    port: 443
+  - name: backend2
+    host: www.baidu.com
+    port: 80
+
+routes:
+  - path: /api/v1/
+    target: backend1
+  - path: /api/v2/*
+    target: backend2
+  - path: /**
+    baseDir: /Users/zhengjw22mac123/IdeaProjects/book/_book
+
