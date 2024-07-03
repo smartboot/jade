@@ -13,8 +13,6 @@ import org.smartboot.http.server.HttpResponse;
 import org.smartboot.http.server.HttpServerHandler;
 import org.smartboot.http.server.impl.Request;
 import org.smartboot.jade.conf.BackendProxy;
-import org.smartboot.socket.extension.plugins.SslPlugin;
-import org.smartboot.socket.extension.ssl.factory.ClientSSLContextFactory;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -36,9 +34,8 @@ public class ProxyServerHandler extends HttpServerHandler {
     @Override
     public void onHeaderComplete(Request request) throws IOException {
         super.onHeaderComplete(request);
-        HttpClient httpClient = new HttpClient(backendProxy.getHost(), backendProxy.getPort());
+        HttpClient httpClient = new HttpClient(backendProxy.getUrl());
         try {
-            httpClient.configuration().addPlugin(new SslPlugin<>(new ClientSSLContextFactory()));
             httpClient.configuration().debug(true).setWriteBufferSize(1024);
         } catch (Exception e) {
             throw new RuntimeException(e);

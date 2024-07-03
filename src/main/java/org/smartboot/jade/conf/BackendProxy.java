@@ -2,8 +2,7 @@ package org.smartboot.jade.conf;
 
 public class BackendProxy {
     private String name;
-    private String host;
-    private int port;
+    private String url;
 
     public String getName() {
         return name;
@@ -13,19 +12,11 @@ public class BackendProxy {
         this.name = name;
     }
 
-    public String getHost() {
-        return host;
+    public String getUrl() {
+        return url;
     }
 
-    public void setHost(String host) {
-        this.host = host;
-    }
-
-    public int getPort() {
-        return port;
-    }
-
-    public void setPort(int port) {
-        this.port = port;
+    public void setUrl(String url) {
+        this.url = url;
     }
 }
