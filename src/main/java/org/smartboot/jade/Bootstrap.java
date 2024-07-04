@@ -1,12 +1,12 @@
 package org.smartboot.jade;
 
 import org.smartboot.http.common.utils.StringUtils;
-import org.smartboot.jade.conf.BackendProxy;
-import org.smartboot.jade.conf.Config;
-import org.smartboot.jade.proxy.ProxyServerHandler;
 import org.smartboot.http.server.HttpBootstrap;
 import org.smartboot.http.server.handler.HttpRouteHandler;
 import org.smartboot.http.server.handler.HttpStaticResourceHandler;
+import org.smartboot.jade.conf.BackendProxy;
+import org.smartboot.jade.conf.Config;
+import org.smartboot.jade.proxy.ProxyServerHandler;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.FileInputStream;
@@ -38,7 +38,7 @@ public class Bootstrap {
         config.getServers().forEach(backendProxy -> proxyServices.put(backendProxy.getName(), backendProxy));
 
         HttpBootstrap bootstrap = new HttpBootstrap();
-        bootstrap.configuration().serverName("st");
+        bootstrap.configuration().serverName("st").readBufferSize(8 * 1024).writeBufferSize(8 * 1024);
 
 
         HttpRouteHandler routeHandler = new HttpRouteHandler();
@@ -47,12 +47,12 @@ public class Bootstrap {
             if (StringUtils.isNotBlank(route.getBaseDir())) {
                 routeHandler.route(route.getPath(), new HttpStaticResourceHandler(route.getBaseDir()));
             } else if (StringUtils.isNotBlank(route.getTarget())) {
-                routeHandler.route(route.getPath()+"**", new ProxyServerHandler(route.getPath(),proxyServices.get(route.getTarget())));
+                routeHandler.route(route.getPath() + "**", new ProxyServerHandler(route.getPath(), proxyServices.get(route.getTarget())));
             }
         });
 
         bootstrap.httpHandler(routeHandler);
-        bootstrap.configuration().debug(true);
+        bootstrap.configuration().debug(false);
         bootstrap.setPort(config.getPort()).start();
     }
 }

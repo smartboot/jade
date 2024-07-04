@@ -36,7 +36,7 @@ public class ProxyServerHandler extends HttpServerHandler {
         super.onHeaderComplete(request);
         HttpClient httpClient = new HttpClient(backendProxy.getUrl());
         try {
-            httpClient.configuration().debug(true).setWriteBufferSize(1024);
+            httpClient.configuration().debug(false).readBufferSize(1024 * 8).setWriteBufferSize(1024 * 8);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -66,14 +66,9 @@ public class ProxyServerHandler extends HttpServerHandler {
                 //将后端的响应反馈给前端
                 var backendSession = request.getSession();
                 backendSession.awaitRead();
-                byte[] bytes = new byte[buffer.remaining()];
-                buffer.get(bytes);
 //                System.out.println(new String(bytes));
-                if (bytes.length == 0) {
-                    System.out.println("aaa");
-                }
                 try {
-                    clientSession.writeBuffer().write(bytes, 0, bytes.length, writeBuffer -> {
+                    clientSession.writeBuffer().transferFrom(buffer, writeBuffer -> {
                         backendSession.signalRead();
                     });
                 } catch (IOException e) {
@@ -82,19 +77,20 @@ public class ProxyServerHandler extends HttpServerHandler {
                 return BodyStreamStatus.OnAsync;
             }
         });
-
-        rest.body().flush();
     }
 
     @Override
     public BodyStreamStatus onBodyStream(ByteBuffer buffer, Request request) {
+
         //将前端的数据包投递给后台
         var proxy = proxies.get(request);
-        byte[] bytes = new byte[buffer.remaining()];
-        buffer.get(bytes);
+        if (!buffer.hasRemaining()) {
+            proxy.rest.body().flush();
+            return BodyStreamStatus.Continue;
+        }
         request.getAioSession().awaitRead();
         Body body = proxy.rest.body();
-        body.write(bytes, 0, bytes.length, (Consumer<Body<? extends HttpRest>>) _ -> request.getAioSession().signalRead());
+        body.transferFrom(buffer, (Consumer<Body<? extends HttpRest>>) _ -> request.getAioSession().signalRead());
         return BodyStreamStatus.OnAsync;
     }
 

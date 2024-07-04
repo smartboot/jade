@@ -1,6 +1,6 @@
 [
   {
-    "name": "org.smartboot.http.graal.conf.Config",
+    "name": "org.smartboot.jade.conf.Config",
     "methods": [{"name": "<init>", "parameterTypes": [] }],
     "allDeclaredConstructors": true,
     "allPublicConstructors": true,
@@ -8,7 +8,7 @@
     "allPublicMethods": true
   },
   {
-    "name": "org.smartboot.http.graal.conf.BackendProxy",
+    "name": "org.smartboot.jade.conf.BackendProxy",
     "methods": [{"name": "<init>", "parameterTypes": [] }],
     "allDeclaredConstructors": true,
     "allPublicConstructors": true,
@@ -16,7 +16,7 @@
     "allPublicMethods": true
   },
   {
-    "name": "org.smartboot.http.graal.conf.Route",
+    "name": "org.smartboot.jade.conf.Route",
     "methods": [{"name": "<init>", "parameterTypes": [] }],
     "allDeclaredConstructors": true,
     "allPublicConstructors": true,
