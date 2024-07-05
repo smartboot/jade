@@ -1,8 +1,14 @@
 package org.smartboot.jade;
 
+import org.smartboot.http.common.enums.HeaderNameEnum;
+import org.smartboot.http.common.enums.HttpStatus;
 import org.smartboot.http.common.utils.CollectionUtils;
+import org.smartboot.http.common.utils.Mimetypes;
 import org.smartboot.http.common.utils.StringUtils;
 import org.smartboot.http.server.HttpBootstrap;
+import org.smartboot.http.server.HttpRequest;
+import org.smartboot.http.server.HttpResponse;
+import org.smartboot.http.server.HttpServerHandler;
 import org.smartboot.http.server.handler.HttpRouteHandler;
 import org.smartboot.http.server.handler.HttpStaticResourceHandler;
 import org.smartboot.jade.conf.BackendProxy;
@@ -13,12 +19,14 @@ import org.yaml.snakeyaml.Yaml;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
  * mvn -Pnative -Dagent=true -DskipTests clean package
+ * mvn -Pjar -DskipTests clean package
  */
 public class Bootstrap {
     public static void main(String[] args) throws IOException, URISyntaxException {
@@ -57,7 +65,30 @@ public class Bootstrap {
 
         HttpRouteHandler routeHandler = new HttpRouteHandler();
         if (noneConf) {
-            routeHandler.route("/**", new HttpStaticResourceHandler(Thread.currentThread().getContextClassLoader().getResource("static").toURI()));
+            routeHandler.route("/**", new HttpServerHandler() {
+                @Override
+                public void handle(HttpRequest request, HttpResponse response) throws Throwable {
+                    response.getOutputStream().write(HomeTpl.html);
+                }
+            });
+            routeHandler.route("/favicon.ico", new HttpServerHandler() {
+                @Override
+                public void handle(HttpRequest request, HttpResponse response) throws Throwable {
+                    try (InputStream inputStream = HttpStaticResourceHandler.class.getClassLoader().getResourceAsStream("favicon.ico")) {
+                        if (inputStream == null) {
+                            response.setHttpStatus(HttpStatus.NOT_FOUND);
+                            return;
+                        }
+                        String contentType = Mimetypes.getInstance().getMimetype("favicon.ico");
+                        response.setHeader(HeaderNameEnum.CONTENT_TYPE.getName(), contentType + "; charset=utf-8");
+                        byte[] bytes = new byte[4094];
+                        int length;
+                        while ((length = inputStream.read(bytes)) != -1) {
+                            response.getOutputStream().write(bytes, 0, length);
+                        }
+                    }
+                }
+            });
         } else {
             config.getRoutes().forEach(route -> {
                 if (StringUtils.isNotBlank(route.getBaseDir())) {
