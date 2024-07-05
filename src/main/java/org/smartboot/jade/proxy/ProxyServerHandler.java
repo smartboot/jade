@@ -36,7 +36,7 @@ public class ProxyServerHandler extends HttpServerHandler {
         super.onHeaderComplete(request);
         HttpClient httpClient = new HttpClient(backendProxy.getUrl());
         try {
-            httpClient.configuration().debug(false).readBufferSize(1024 * 8).setWriteBufferSize(1024 * 8);
+            httpClient.configuration().debug(true).readBufferSize(1024 * 8).setWriteBufferSize(1024 * 8);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -66,7 +66,6 @@ public class ProxyServerHandler extends HttpServerHandler {
                 //将后端的响应反馈给前端
                 var backendSession = request.getSession();
                 backendSession.awaitRead();
-//                System.out.println(new String(bytes));
                 try {
                     clientSession.writeBuffer().transferFrom(buffer, writeBuffer -> {
                         backendSession.signalRead();
@@ -81,7 +80,6 @@ public class ProxyServerHandler extends HttpServerHandler {
 
     @Override
     public BodyStreamStatus onBodyStream(ByteBuffer buffer, Request request) {
-
         //将前端的数据包投递给后台
         var proxy = proxies.get(request);
         if (!buffer.hasRemaining()) {

@@ -4,7 +4,7 @@ import java.util.List;
 
 public class Config {
     private String host;
-    private int port;
+    private int port = 8080;
     private List<Route> routes;
     private List<BackendProxy> servers;
 
