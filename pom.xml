@@ -74,6 +74,7 @@
                                 --no-fallback
                                 --verbose
                                 --report-unsupported-elements-at-runtime
+                                -H:+StaticExecutableWithDynamicLibC
                                 -H:ReflectionConfigurationFiles=reflection-config.json
                                 -H:IncludeResources=META-INF/*.*|mime.types|License.shield
                             </buildArgs>
