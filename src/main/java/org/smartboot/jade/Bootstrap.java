@@ -33,15 +33,19 @@ public class Bootstrap {
         //解析 -conf 参数
         String conf = "";
 //        conf = "/Users/zhengjw22mac123/IdeaProjects/jade/src/main/resources/st.yaml";
+        int port = 8080;
         for (int i = 0; i < args.length; i++) {
             if (Constant.ARG_CONF.equals(args[i])) {
                 conf = args[++i];
+            } else if (Constant.ARG_PORT.equals(args[i])) {
+                port = Integer.parseInt(args[++i]);
             }
         }
         Config config;
         boolean noneConf = true;
         if (StringUtils.isBlank(conf)) {
             config = new Config();
+            config.setPort(port);
         } else {
             File file = new File(conf);
             if (!file.isFile()) {
