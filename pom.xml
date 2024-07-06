@@ -14,11 +14,11 @@
     <!--    </parent>-->
     <packaging>jar</packaging>
     <properties>
-        <smarthttp.version>1.5.2</smarthttp.version>
+        <smarthttp.version>1.5.3</smarthttp.version>
         <native.maven.plugin.version>0.10.1</native.maven.plugin.version>
         <maven.compiler.source>${java.specification.version}</maven.compiler.source>
         <maven.compiler.target>${java.specification.version}</maven.compiler.target>
-        <imageName>st</imageName>
+        <imageName>jade</imageName>
         <mainClass>org.smartboot.jade.Bootstrap</mainClass>
     </properties>
     <dependencies>

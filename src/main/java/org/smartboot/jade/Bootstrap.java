@@ -26,13 +26,13 @@ import java.util.Map;
 
 /**
  * mvn -Pnative -Dagent=true -DskipTests clean package
- * mvn -Pjar -DskipTests clean package
+ * mvn -Pjar -DskipTests clean package     native-image -jar ...
  */
 public class Bootstrap {
     public static void main(String[] args) throws IOException, URISyntaxException {
         //解析 -conf 参数
-//        String conf = "/Users/zhengjw22mac123/IdeaProjects/jade/src/main/resources/st.yaml";
         String conf = "";
+//        conf = "/Users/zhengjw22mac123/IdeaProjects/jade/src/main/resources/st.yaml";
         for (int i = 0; i < args.length; i++) {
             if (Constant.ARG_CONF.equals(args[i])) {
                 conf = args[++i];

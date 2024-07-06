@@ -36,11 +36,11 @@ public class ProxyServerHandler extends HttpServerHandler {
         super.onHeaderComplete(request);
         HttpClient httpClient = new HttpClient(backendProxy.getUrl());
         try {
-            httpClient.configuration().debug(true).readBufferSize(1024 * 8).setWriteBufferSize(1024 * 8);
+            httpClient.configuration().debug(false).readBufferSize(1024 * 8).setWriteBufferSize(1024 * 8);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        HttpRest rest = httpClient.rest(request.getRequestURI().substring(prefix.length() - 1)).setMethod(request.getMethod());
+        HttpRest rest = httpClient.rest(request.getRequestURI()).setMethod(request.getMethod());
         proxies.put(request, new ProxyUnit(httpClient, rest, request.getRequestType()));
 
 

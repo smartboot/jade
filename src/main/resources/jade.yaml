@@ -9,10 +9,10 @@ servers:
     url: https://www.baidu.com
 
 routes:
-  - path: /api/v1/
-    target: backend1
+  - path: /api/
+    back_pass: http://82.157.162.230:8083/
   - path: /api/v2/
     target: backend2
   - path: /**
-    baseDir: /Users/zhengjw22mac123/IdeaProjects/book/_book
+    baseDir: /Users/zhengjw22mac123/IdeaProjects/smart-mqtt-enterprise/ui/dist
 
